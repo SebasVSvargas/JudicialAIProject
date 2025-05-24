@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block title %}Buscar Procesos{% endblock %}
+{% block content %}
+<h2 class="mb-4">Buscar Procesos Judiciales</h2>
+<form method="POST" class="row g-3">
+  <div class="col-md-6">
+    <label for="nombre" class="form-label">Nombre o NIT</label>
+    <input type="text" class="form-control" id="nombre" name="nombre" required>
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Tipo de Persona</label><br>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="tipo_persona" id="jur" value="jur" checked>
+      <label class="form-check-label" for="jur">Jurídica</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="tipo_persona" id="nat" value="nat">
+      <label class="form-check-label" for="nat">Natural</label>
+    </div>
+  </div>
+  <div class="col-md-3 form-check">
+    <input class="form-check-input" type="checkbox" id="solo_activos" name="solo_activos" checked>
+    <label class="form-check-label" for="solo_activos">Solo activos</label>
+  </div>
+  <div class="col-md-6">
+    <label for="codificacion_despacho" class="form-label">Codificación Despacho (opcional)</label>
+    <input type="text" class="form-control" id="codificacion_despacho" name="codificacion_despacho" placeholder="05001 para Medellín">
+  </div>
+  <div class="col-12">
+    <button type="submit" class="btn btn-primary">Buscar</button>
+  </div>
+</form>
+{% endblock %}

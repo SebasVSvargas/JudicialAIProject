@@ -5,7 +5,7 @@ import os
 import logging
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
-# from langchain_groq import ChatGroq # Uncomment if you add Groq
+# from langchain_groq import ChatGroq # Uncomment if you add Groq  #otra alternativa a Google por si las moscas
 
 # Configure basic logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), '.env'))
 
 # --- Google Generative AI Configuration ---
-google_api_key = os.getenv("GOOGLE_API_KEY")
+google_api_key = os.getenv("GOOGLE_API_KEY") #OJO SE DEBE BORRAR, NO COMPARTIR
 
 if not google_api_key:
     logging.warning("GOOGLE_API_KEY not found in .env file. Google GenAI services will not be available.")

@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{% block title %}Resultados{% endblock %}
+{% block content %}
+<h2 class="mb-4">Procesos encontrados para “{{ nombre }}”</h2>
+{% if procesos %}
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>ID Proceso</th>
+      <th>Demandante</th>
+      <th>Demandado</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for p in procesos %}
+    <tr>
+      <td>{{ p.idProceso }}</td>
+      <td>{{ p.demandante or '-' }}</td>
+      <td>{{ p.demandado or '-' }}</td>
+      <td>
+        <a href="{{ url_for('main.detalle', id_proceso=p.idProceso) }}" class="btn btn-sm btn-info">Detalle</a>
+        <a href="{{ url_for('main.actuaciones', id_proceso=p.idProceso) }}" class="btn btn-sm btn-secondary">Actuaciones</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No se encontraron procesos.</p>
+{% endif %}
+<a href="{{ url_for('main.index') }}" class="btn btn-link mt-3">🔄 Nueva búsqueda</a>
+{% endblock %}
+

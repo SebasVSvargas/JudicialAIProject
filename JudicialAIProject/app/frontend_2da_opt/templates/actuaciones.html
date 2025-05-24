@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block title %}Actuaciones{% endblock %}
+{% block content %}
+<h2 class="mb-4">Actuaciones del Proceso {{ detalles.numeroRadicacion }}</h2>
+{% if actuaciones %}
+<ul class="list-group">
+  {% for a in actuaciones %}
+  <li class="list-group-item mb-2">
+    <div><strong>{{ a.fechaActuacion[:10] }}</strong> — {{ a.actuacion }}</div>
+    <div>{{ a.anotacion[:100] }}{% if a.anotacion|length > 100 %}…{% endif %}</div>
+    {% if a.resumen_ia %}
+    <div class="mt-2 p-2 bg-white border">
+      <strong>Resumen IA:</strong> {{ a.resumen_ia }}
+    </div>
+    <div class="mt-1">
+      <strong>Urgencia:</strong>
+      <span class="badge
+        {% if a.clasificacion_urgencia_ia=='ALTA' %}bg-danger
+        {% elif a.clasificacion_urgencia_ia=='MEDIA' %}bg-warning text-dark
+        {% else %}bg-secondary{% endif %}">
+        {{ a.clasificacion_urgencia_ia }}
+      </span>
+    </div>
+    {% endif %}
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>No hay actuaciones disponibles para este proceso.</p>
+{% endif %}
+<a href="{{ url_for('main.index') }}" class="btn btn-link mt-3">🔄 Nueva búsqueda</a>
+{% endblock %}

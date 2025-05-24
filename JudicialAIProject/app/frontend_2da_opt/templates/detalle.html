@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block title %}Detalle del Proceso{% endblock %}
+{% block content %}
+<h2 class="mb-4">Detalle del Proceso {{ detalles.numeroRadicacion }}</h2>
+<ul class="list-group mb-3">
+  <li class="list-group-item"><strong>Tipo:</strong> {{ detalles.tipoProceso or '-' }}</li>
+  <li class="list-group-item"><strong>Clase:</strong> {{ detalles.claseProceso or '-' }}</li>
+  <li class="list-group-item">
+    <strong>Ubicación:</strong>
+    {{ detalles.ubicacion or detalles.ubicacionExpediente or '-' }}
+  </li>
+</ul>
+<a href="{{ url_for('main.actuaciones', id_proceso=detalles.idProceso) }}" class="btn btn-secondary">Ver Actuaciones</a>
+<a href="{{ url_for('main.index') }}" class="btn btn-link">🔄 Nueva búsqueda</a>
+{% endblock %}
