@@ -7,6 +7,9 @@ from passlib.context import CryptContext
 from sqlalchemy import Column, Integer, String, create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base, Session
 
+import streamlit as st
+import requests
+
 # Configuración de la app y JWT
 app = FastAPI()
 
@@ -87,3 +90,26 @@ async def read_users_me(token: str = Depends(oauth2_scheme)):
         return {"username": username}
     except JWTError:
         raise HTTPException(status_code=401, detail="Token inválido o expirado")
+
+
+st.title("🔐 Inicio de sesión JudicialAIProject")
+
+# Formulario
+with st.form("login_form"):
+    username = st.text_input("Usuario")
+    password = st.text_input("Contraseña", type="password")
+    submit = st.form_submit_button("Iniciar sesión")
+
+if submit:
+    if username and password:
+        response = requests.post("http://127.0.0.1:8000/token", data={
+            "username": username,
+            "password": password
+        })
+
+        if response.status_code == 200:
+            token = response.json()["access_token"]
+            st.success("✅ Login exitoso")
+            st.session_state["token"] = token  # Guardamos el token para futuras consultas
+        else:
+            st.error("❌ Usuario o contraseña incorrectos")
