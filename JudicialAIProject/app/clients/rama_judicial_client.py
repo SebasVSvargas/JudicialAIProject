@@ -30,6 +30,9 @@ def consultar_procesos_por_nombre(
         A dictionary with the API response or None if an error occurs.
     '''
     endpoint = f"{BASE_URL}/Procesos/Consulta/NombreRazonSocial"
+    headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
     params = {
         "nombre": nombre,
         "tipoPersona": tipo_persona,
@@ -40,7 +43,7 @@ def consultar_procesos_por_nombre(
         params["codificacionDespacho"] = codificacion_despacho
 
     try:
-        response = requests.get(endpoint, params=params, timeout=30)
+        response = requests.get(endpoint, params=params, timeout=30, headers=headers)
         response.raise_for_status()  # Raises an HTTPError for bad responses (4XX or 5XX)
         return response.json()
     except requests.exceptions.HTTPError as http_err:
@@ -64,8 +67,11 @@ def consultar_detalle_proceso(id_proceso: str) -> dict | None:
         A dictionary with the process details or None if an error occurs.
     '''
     endpoint = f"{BASE_URL}/Proceso/Detalle/{id_proceso}"
+    headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
     try:
-        response = requests.get(endpoint, timeout=30)
+        response = requests.get(endpoint, timeout=30,headers=headers)
         response.raise_for_status()
         return response.json()
     except requests.exceptions.HTTPError as http_err:
@@ -85,8 +91,11 @@ def consultar_actuaciones_proceso(id_proceso: str) -> dict | None:
         A dictionary with the process actions or None if an error occurs.
     '''
     endpoint = f"{BASE_URL}/Proceso/Actuaciones/{id_proceso}"
+    headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
     try:
-        response = requests.get(endpoint, timeout=30)
+        response = requests.get(endpoint, timeout=30, headers=headers)
         response.raise_for_status()
         # The response for actuaciones is often a list directly, not a dict with a key
         # However, to be safe and consistent with other functions, we check if it's a dict
@@ -97,6 +106,90 @@ def consultar_actuaciones_proceso(id_proceso: str) -> dict | None:
         logging.error(f"HTTP error occurred while fetching actions for process {id_proceso}: {http_err} - {response.text}")
     except requests.exceptions.RequestException as req_err:
         logging.error(f"Error fetching actions for process {id_proceso}: {req_err}")
+    return None
+
+def consultar_procesos_por_numero_radicacion(
+    numero_radicacion: str,
+    solo_activos: bool = False,
+    pagina: int = 1
+) -> dict | None:
+    """
+    Consults processes by their unique registration number (numero de radicación).
+
+    Args:
+        numero_radicacion: The complete registration number of the process.
+        solo_activos: False to search for all processes (active and inactive).
+                      The API example uses false, so defaulting to that.
+        pagina: Page number for results.
+
+    Returns:
+        A dictionary with the API response or None if an error occurs.
+    """
+    endpoint = f"{BASE_URL}/Procesos/Consulta/NumeroRadicacion"
+    headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
+    params = {
+        "numero": numero_radicacion,
+        "SoloActivos": str(solo_activos).lower(),
+        "pagina": pagina
+    }
+    try:
+        response = requests.get(endpoint, params=params, timeout=30, headers=headers)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.HTTPError as http_err:
+        logging.error(f"HTTP error occurred while fetching process by numero_radicacion {numero_radicacion}: {http_err} - {response.text}")
+    except requests.exceptions.RequestException as req_err:
+        logging.error(f"Error fetching process by numero_radicacion {numero_radicacion}: {req_err}")
+    return None
+
+def consultar_documentos_actuacion(id_reg_actuacion: str) -> dict | None:
+    """
+    Retrieves documents associated with a specific judicial action (actuación).
+
+    Args:
+        id_reg_actuacion: The unique identifier of the judicial action registration.
+
+    Returns:
+        A dictionary with the documents list or None if an error occurs.
+    """
+    endpoint = f"{BASE_URL}/Proceso/DocumentosActuacion/{id_reg_actuacion}"
+    headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
+    try:
+        response = requests.get(endpoint, timeout=30, headers=headers)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.HTTPError as http_err:
+        logging.error(f"HTTP error occurred while fetching documents for actuacion {id_reg_actuacion}: {http_err} - {response.text}")
+    except requests.exceptions.RequestException as req_err:
+        logging.error(f"Error fetching documents for actuacion {id_reg_actuacion}: {req_err}")
+    return None
+
+def descargar_documento_actuacion(id_reg_documento: str) -> bytes | None:
+    """
+    Downloads a specific document associated with a judicial action.
+
+    Args:
+        id_reg_documento: The unique identifier of the document registration.
+
+    Returns:
+        The binary content of the document or None if an error occurs.
+    """
+    endpoint = f"{BASE_URL}/Descarga/Documento/{id_reg_documento}"
+    headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
+    try:
+        response = requests.get(endpoint, timeout=60, headers=headers) # Increased timeout for potentially larger files
+        response.raise_for_status()
+        return response.content # Return raw bytes for file content
+    except requests.exceptions.HTTPError as http_err:
+        logging.error(f"HTTP error occurred while downloading document {id_reg_documento}: {http_err} - {response.text}")
+    except requests.exceptions.RequestException as req_err:
+        logging.error(f"Error downloading document {id_reg_documento}: {req_err}")
     return None
 
 # Example Usage (for testing purposes):
@@ -156,14 +249,49 @@ if __name__ == "__main__":
     else:
         print(f"No actuaciones found for process {test_id_proceso_static} or error occurred.")
 
-    # Example for an endpoint from Reto1.txt not in the initial user prompt but useful for context
-    # test_id_reg_actuacion = "1715845581" # From Reto1.txt example for DocumentosActuacion
-    # print(f"\n--- Test: Consultar Documentos de Actuación ({test_id_reg_actuacion}) ---")
-    # This function is not yet defined above, but would be similar to the others.
-    # documentos_actuacion = consultar_documentos_actuacion(test_id_reg_actuacion) # Placeholder
-    # if documentos_actuacion:
-    #     print("Documentos de la actuación:", documentos_actuacion)
-    # else:
-    #     print(f"No documents found for actuación {test_id_reg_actuacion} or error occurred.")
+    # Test new functions
+    test_numero_radicacion = "05001418900820250032700" # Example from prompt
+    print(f"\\n--- Test: Consultar Procesos por Número de Radicación ({test_numero_radicacion}) ---")
+    proceso_rad = consultar_procesos_por_numero_radicacion(test_numero_radicacion)
+    if proceso_rad and proceso_rad.get("procesos"):
+        print(f"Found {len(proceso_rad['procesos'])} process(es).")
+        for p in proceso_rad["procesos"][:1]:
+             print(f"  ID Proceso: {p.get('idProceso')}, Demandante: {p.get('demandante')}, Demandado: {p.get('demandado')}")
+    elif proceso_rad:
+        print("Proceso por radicado response:", proceso_rad)
+    else:
+        print(f"No proceso found for radicado {test_numero_radicacion} or error occurred.")
 
+    test_id_reg_actuacion_docs = "1715845581" # Example from prompt
+    print(f"\\n--- Test: Consultar Documentos de Actuación ({test_id_reg_actuacion_docs}) ---")
+    documentos_actuacion = consultar_documentos_actuacion(test_id_reg_actuacion_docs)
+    test_id_reg_documento_descarga = None
+    if documentos_actuacion and isinstance(documentos_actuacion, list) and documentos_actuacion:
+        print(f"Found {len(documentos_actuacion)} documento(s) for actuación {test_id_reg_actuacion_docs}.")
+        for doc in documentos_actuacion[:1]: # Print first document info
+            print(f"  Nombre: {doc.get('nombre')}, ID Reg Documento: {doc.get('idRegDocumento')}, Checksum: {doc.get('checksum')}")
+            if 'idRegDocumento' in doc and not test_id_reg_documento_descarga:
+                test_id_reg_documento_descarga = str(doc.get('idRegDocumento'))
+    elif documentos_actuacion:
+         print("Documentos actuación response:", documentos_actuacion) # Print raw response
+    else:
+        print(f"No documents found for actuación {test_id_reg_actuacion_docs} or error occurred.")
+
+    if test_id_reg_documento_descarga:
+        print(f"\\n--- Test: Descargar Documento ({test_id_reg_documento_descarga}) ---")
+        documento_contenido = descargar_documento_actuacion(test_id_reg_documento_descarga)
+        if documento_contenido:
+            print(f"Documento descargado. Tamaño: {len(documento_contenido)} bytes.")
+            # Example: Save the document
+            # try:
+            #     with open(f"documento_{test_id_reg_documento_descarga}.pdf", "wb") as f: # Assuming PDF
+            #         f.write(documento_contenido)
+            #     print(f"Documento guardado como documento_{test_id_reg_documento_descarga}.pdf")
+            # except IOError as e:
+            #     print(f"Error al guardar el documento: {e}")
+        else:
+            print(f"No se pudo descargar el documento {test_id_reg_documento_descarga} or error occurred.")
+    else:
+        print("\\nSkipping Test: Descargar Documento - No idRegDocumento available from previous step.")
+    
     logging.info("Finished testing Rama Judicial API client.")
