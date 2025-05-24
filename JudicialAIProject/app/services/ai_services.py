@@ -41,13 +41,12 @@ Considera los siguientes criterios para la clasificación:
 - MEDIA: Actualizaciones importantes que deben ser revisadas pronto pero no requieren acción inmediata, autos de trámite relevantes.
 - BAJA: Notificaciones informativas, actualizaciones menores, constancias.
 
-Tipo de Actuación: {tipo_actuacion}
 Anotación de la Actuación: {texto_actuacion}
 
 Clasificación de Urgencia (solo una palabra: ALTA, MEDIA, o BAJA):
 """
 classification_prompt = PromptTemplate(
-    input_variables=["tipo_actuacion", "texto_actuacion"],
+    input_variables=["texto_actuacion"],
     template=classification_template_text
 )
 
@@ -80,7 +79,7 @@ def generar_resumen_actuacion(texto_actuacion: str) -> str | None:
         logging.error(f"Error al generar resumen con LLM: {e}")
         return None
 
-def clasificar_urgencia_actuacion(tipo_actuacion: str, texto_actuacion: str) -> str | None:
+def clasificar_urgencia_actuacion(texto_actuacion: str) -> str | None:
     '''
     Classifies the urgency of a given judicial action using the configured LLM.
 
@@ -101,14 +100,14 @@ def clasificar_urgencia_actuacion(tipo_actuacion: str, texto_actuacion: str) -> 
     try:
         chain = classification_prompt | default_llm | StrOutputParser()
         classification = chain.invoke({
-            "tipo_actuacion": tipo_actuacion if tipo_actuacion else "N/A",
+            
             "texto_actuacion": texto_actuacion
         })
         # Ensure the output is one of the expected categories
         valid_classifications = ["ALTA", "MEDIA", "BAJA"]
         parsed_classification = classification.strip().upper()
         if parsed_classification in valid_classifications:
-            logging.info(f"Clasificación de urgencia generada: {parsed_classification} para la actuación: {tipo_actuacion}")
+            logging.info(f"Clasificación de urgencia generada: {parsed_classification}")
             return parsed_classification
         else:
             logging.warning(f"Clasificación no reconocida '{parsed_classification}'. Se devolverá MEDIA por defecto.")
@@ -118,50 +117,50 @@ def clasificar_urgencia_actuacion(tipo_actuacion: str, texto_actuacion: str) -> 
         return None
 
 # --- Example Usage (for testing this module directly) ---
-if __name__ == "__main__":
-    if not default_llm:
-        logging.error("LLM no configurado. Por favor, verifica tu .env y llm_config.py")
-    else:
-        logging.info("Probando servicios de IA...")
+# if __name__ == "__main__":
+#     if not default_llm:
+#         logging.error("LLM no configurado. Por favor, verifica tu .env y llm_config.py")
+#     else:
+#         logging.info("Probando servicios de IA...")
         
-        sample_anotacion_1 = ("SE ADMITE DEMANDA Y SE ORDENA NOTIFICAR A LA PARTE DEMANDADA. "
-                              "SE CONCEDE TÉRMINO DE 10 DÍAS PARA CONTESTAR.")
-        sample_tipo_1 = "AUTO ADMISORIO"
+#         sample_anotacion_1 = ("SE ADMITE DEMANDA Y SE ORDENA NOTIFICAR A LA PARTE DEMANDADA. "
+#                               "SE CONCEDE TÉRMINO DE 10 DÍAS PARA CONTESTAR.")
+#         sample_tipo_1 = "AUTO ADMISORIO"
 
-        sample_anotacion_2 = ("SE RECIBE MEMORIAL DE LA PARTE ACTORA APORTANDO PRUEBAS. "
-                              "SECRETARÍA AGREGUE AL EXPEDIENTE.")
-        sample_tipo_2 = "Memorial"
+#         sample_anotacion_2 = ("SE RECIBE MEMORIAL DE LA PARTE ACTORA APORTANDO PRUEBAS. "
+#                               "SECRETARÍA AGREGUE AL EXPEDIENTE.")
+#         sample_tipo_2 = "Memorial"
 
-        sample_anotacion_3 = ("AUDIENCIA DE CONCILIACIÓN FIJADA PARA EL DÍA 05 DE JUNIO DE 2025 A LAS 09:00 AM. "
-                              "SE REQUIERE LA COMPARECENCIA DE LAS PARTES.")
-        sample_tipo_3 = "FIJACION FECHA AUDIENCIA"
+#         sample_anotacion_3 = ("AUDIENCIA DE CONCILIACIÓN FIJADA PARA EL DÍA 05 DE JUNIO DE 2025 A LAS 09:00 AM. "
+#                               "SE REQUIERE LA COMPARECENCIA DE LAS PARTES.")
+#         sample_tipo_3 = "FIJACION FECHA AUDIENCIA"
 
-        print("\n--- Prueba de Resumen 1 ---")
-        resumen1 = generar_resumen_actuacion(sample_anotacion_1)
-        if resumen1:
-            print(f"Anotación Original: {sample_anotacion_1}")
-            print(f"Resumen IA: {resumen1}")
+#         print("\n--- Prueba de Resumen 1 ---")
+#         resumen1 = generar_resumen_actuacion(sample_anotacion_1)
+#         if resumen1:
+#             print(f"Anotación Original: {sample_anotacion_1}")
+#             print(f"Resumen IA: {resumen1}")
 
-        print("\n--- Prueba de Clasificación 1 ---")
-        clasificacion1 = clasificar_urgencia_actuacion(sample_tipo_1, sample_anotacion_1)
-        if clasificacion1:
-            print(f"Tipo: {sample_tipo_1}, Anotación: {sample_anotacion_1}")
-            print(f"Clasificación IA: {clasificacion1}")
+#         print("\n--- Prueba de Clasificación 1 ---")
+#         clasificacion1 = clasificar_urgencia_actuacion(sample_tipo_1, sample_anotacion_1)
+#         if clasificacion1:
+#             print(f"Tipo: {sample_tipo_1}, Anotación: {sample_anotacion_1}")
+#             print(f"Clasificación IA: {clasificacion1}")
 
-        print("\n--- Prueba de Resumen 2 ---")
-        resumen2 = generar_resumen_actuacion(sample_anotacion_2)
-        if resumen2:
-            print(f"Anotación Original: {sample_anotacion_2}")
-            print(f"Resumen IA: {resumen2}")
+#         print("\n--- Prueba de Resumen 2 ---")
+#         resumen2 = generar_resumen_actuacion(sample_anotacion_2)
+#         if resumen2:
+#             print(f"Anotación Original: {sample_anotacion_2}")
+#             print(f"Resumen IA: {resumen2}")
 
-        print("\n--- Prueba de Clasificación 2 ---")
-        clasificacion2 = clasificar_urgencia_actuacion(sample_tipo_2, sample_anotacion_2)
-        if clasificacion2:
-            print(f"Tipo: {sample_tipo_2}, Anotación: {sample_anotacion_2}")
-            print(f"Clasificación IA: {clasificacion2}")
+#         print("\n--- Prueba de Clasificación 2 ---")
+#         clasificacion2 = clasificar_urgencia_actuacion(sample_tipo_2, sample_anotacion_2)
+#         if clasificacion2:
+#             print(f"Tipo: {sample_tipo_2}, Anotación: {sample_anotacion_2}")
+#             print(f"Clasificación IA: {clasificacion2}")
 
-        print("\n--- Prueba de Clasificación 3 (Urgente) ---")
-        clasificacion3 = clasificar_urgencia_actuacion(sample_tipo_3, sample_anotacion_3)
-        if clasificacion3:
-            print(f"Tipo: {sample_tipo_3}, Anotación: {sample_anotacion_3}")
-            print(f"Clasificación IA: {clasificacion3}")
+#         print("\n--- Prueba de Clasificación 3 (Urgente) ---")
+#         clasificacion3 = clasificar_urgencia_actuacion(sample_tipo_3, sample_anotacion_3)
+#         if clasificacion3:
+#             print(f"Tipo: {sample_tipo_3}, Anotación: {sample_anotacion_3}")
+#             print(f"Clasificación IA: {clasificacion3}")
