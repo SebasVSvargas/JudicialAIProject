@@ -1,0 +1,196 @@
+Monitoreo y Clasificación Automatizada de Procesos Judiciales con Inteligencia Artificial Generativa (GenAI)
+OBJETIVO DEL RETO
+Automatizar la consulta, seguimiento y análisis de procesos judiciales en Colombia, utilizando inteligencia artificial generativa (GenAI) para facilitar la gestión jurídica de las empresas. Se busca reducir la carga operativa diaria asociada a la revisión manual de estados judiciales. Esto se logrará mediante una solución que consulte APIs públicas y aplique GenAI para interpretar las actualizaciones relevantes en procesos activos.
+DESCRIPCIÓN DEL RETO
+Actualmente, la revisión de procesos judiciales es una tarea manual y repetitiva que puede consumir varias horas diarias, según el volumen de radicados de cada empresa. El reto consiste en desarrollar una aplicación web que permita:
+Consultar automáticamente los procesos asociados a una empresa (por nombre o NIT).
+Obtener sus actualizaciones (actuaciones, documentos, audiencias, etc.).
+Aplicar modelos de IA Generativa para identificar y priorizar acciones relevantes como citaciones, requerimientos o vencimientos.
+Se podrá utilizar información de la Rama Judicial, accesible vía API pública sin login ni captcha. Otras fuentes como la Superintendencia de Industria y Comercio (SIC), que requieren resolver captchas, quedan excluidas del alcance de este reto.
+La solución puede enfocarse en funcionalidades como:
+Generación automática de resúmenes de documentos.
+Clasificación de la importancia de las actuaciones.
+Notificaciones por correo electrónico.
+Agendamiento automático de eventos en calendarios.
+NIVELES DE PARTICIPACIÓN Y FUNCIONALIDADES ESPERADAS
+Nivel Básico (Junior)
+Se espera construir una aplicación web funcional que permita consultar procesos judiciales desde la Rama Judicial, visualizar sus actuaciones y aplicar IA generativa para resumir y clasificar la información.
+Funcionalidades esperadas:
+Consulta de procesos judiciales desde la Rama Judicial (por NIT, razón social o número de radicado).
+Visualización del estado general del proceso y lista de actuaciones.
+Generación de resúmenes automáticos.
+Clasificación automática de actuaciones según su urgencia (ej. audiencia, requerimiento).
+Almacenamiento de resultados en base de datos para trazabilidad.
+Interfaz web funcional y de fácil navegación.
+Tecnologías sugeridas: Python, FastAPI, Flask, SQLite/PostgreSQL, LangChain, LLMs (GPT-4, Claude, Mistral), Streamlit, HTML/CSS, JavaScript.
+Observación: Cada equipo puede elegir su stack tecnológico preferido, siempre que cumpla con la funcionalidad esperada. La solución debe ser funcional, clara y fácil de usar. Se puede usar HTML/CSS/JavaScript para la interfaz o herramientas como Streamlit para un desarrollo rápido en Python, enfocándose más en la lógica.
+Nivel Intermedio (Semi-Senior)
+Se espera ampliar la funcionalidad de la aplicación del nivel básico, incorporando la capacidad de procesar documentos adjuntos a las actuaciones judiciales y enriquecer su análisis con IA generativa.
+Funcionalidades esperadas:
+Apertura y lectura de documentos asociados a las actuaciones (principalmente PDF o CSV).
+Generación de resúmenes automáticos del contenido de los documentos usando IA generativa.
+Almacenamiento de documentos descargados y sus resúmenes asociados, permitiendo consulta y reutilización.
+Integración de estas funcionalidades en la interfaz y lógica del nivel básico, asegurando coherencia.
+Tecnologías sugeridas: Python, PyMuPDF/pdfplumber, LangChain, LLMs (GPT-4, Claude, Mistral), Streamlit o React, PostgreSQL.
+Observación: Es recomendable diseñar un esquema de almacenamiento que vincule claramente cada documento con su proceso y actuación, facilitando futuras extensiones (búsquedas, filtrado, integración con componentes de recuperación de información o agentes conversacionales).
+Nivel Avanzado (Senior)
+Se espera transformar la solución en una herramienta conversacional basada en GenAI, capaz de interpretar, responder y accionar en torno a los procesos judiciales. Se valoran prácticas de ingeniería robustas para escalabilidad y producción.
+Funcionalidades esperadas:
+Implementación de un asistente conversacional para consultas como:
+"¿Qué procesos activos tiene la empresa X?"
+"¿Qué actuaciones recientes son críticas?"
+"¿Qué documentos debo revisar con prioridad?"
+Recomendaciones automáticas sobre procesos o actuaciones que requieren atención inmediata.
+Generación automática de alertas o eventos en Google Calendar (u otro) para fechas clave (audiencias, vencimientos).
+Integración fluida con la base de datos de resúmenes (vector store), documentos y procesos de niveles anteriores.
+Despliegue de la solución usando contenedores (Docker) y prácticas modernas de autenticación/autorización (OAuth2).
+Preparación para despliegue en la nube (GCP, Azure, AWS) con potencial uso de pipelines CI/CD.
+Tecnologías sugeridas: LLMs (GPT-4, Claude, Mistral), agentes RAG, memoria contextual, integración con APIs de correo y calendario, Chroma o Pinecone, Docker, OAuth2 (Auth0, Firebase Auth), cloud deployment (GCP, Azure, AWS), CI/CD.
+Observación: Se espera una solución con capacidades avanzadas de IA generativa y una arquitectura sólida, desacoplada y escalable. El agente conversacional debe razonar sobre la base de datos y documentos, idealmente usando técnicas como RAG, chunking o embeddings vectoriales.
+CRITERIOS DE EVALUACIÓN
+Cada solución se evaluará con base en cinco criterios principales, cada uno con puntuación de 1 a 5 (1: Muy bajo, 3: Adecuado, 5: Sobresaliente). La calificación final será el promedio ponderado.
+1. Innovación (20%)
+Evalúa la creatividad en la aplicación de GenAI y la originalidad de la solución.
+Preguntas guía:
+¿Propone un uso novedoso o no obvio de IA generativa?
+¿Usa IA generativa para interpretar información judicial más allá de un simple resumen?
+¿Aprovecha GenAI para reducir ambigüedades o aumentar certeza en documentos legales complejos?
+¿Integra funcionalidades no explícitas pero de alto valor?
+¿Hay uso creativo de modelos (prompt engineering avanzado, combinación de modelos)?
+¿Muestra pensamiento estratégico sobre cómo GenAI puede transformar procesos legales, no solo automatizarlos?
+Escala (1-5):
+Muy baja innovación: Uso superficial de GenAI, sin valor real.
+Baja innovación: GenAI solo para cumplir lo mínimo (resumir texto), sin adaptación al contexto legal.
+Cumplimiento estándar: GenAI para resumir/clasificar según lo solicitado, sin elementos innovadores.
+Alta innovación: GenAI integrada efectivamente, aporta valor agregado, mejora experiencia o anticipa necesidades.
+Innovación sobresaliente: Uso estratégico y original de GenAI que transforma la gestión judicial. Anticipa casos de uso no requeridos, con impacto y visión escalable.
+2. Precisión (20%)
+Evalúa qué tan bien la solución interpreta la información judicial y si las respuestas de la IA (resúmenes, clasificaciones, recomendaciones) son útiles, coherentes y medibles. Se valora la propuesta de criterios y métodos para medir precisión.
+Preguntas guía:
+¿Resúmenes de IA coherentes con el contenido original?
+¿Clasificaciones de tipo/urgencia reflejan adecuadamente la importancia legal?
+¿Se proponen métricas cuantitativas (exactitud, recall, similitud semántica) para evaluar resultados?
+Precisión extractiva: ¿Extrae correctamente información clave?
+Precisión interpretativa: ¿Clasifica adecuadamente tipo/urgencia de actuación?
+¿Se construyó un conjunto de validación/referencia para comparar salidas del modelo?
+¿Permite al usuario final validar/corregir la salida de IA?
+¿Se mitigan errores comunes de modelos (alucinaciones, ambigüedades, sesgos)?
+¿Respuestas del sistema útiles y confiables para decisiones jurídicas?
+¿Clasificación automática discrimina correctamente entre actuaciones críticas y no críticas?
+¿Se justifica claramente la elección de métricas de precisión?
+¿Hay trazabilidad o registro de decisiones de la IA?
+Escala (1-5):
+Sin control de precisión: No se proponen métricas ni se justifica validación. Respuestas IA poco confiables.
+Medición muy limitada o poco clara: Criterios generales de validación, sin métricas claras ni reproducibles.
+Evaluación funcional con métricas básicas: Métricas simples (conteo coincidencias, revisión manual), evidencia razonable de calidad.
+Evaluación estructurada con criterios adecuados: Métricas relevantes (F1, ROUGE, similitud semántica), conjunto de validación y análisis de calidad visible.
+Evaluación sólida, reproducible y bien argumentada: Conjunto claro de evaluación, justificación de métricas, resultados medibles, replicables y ajustados al contexto jurídico.
+3. Usabilidad (20%)
+Evalúa qué tan fácil e intuitivo es interactuar con la solución para un usuario no técnico. La herramienta debe facilitar comprensión, navegación y toma de decisiones en entornos jurídicos.
+Preguntas guía:
+¿Se puede interactuar sin conocimientos técnicos o capacitación extensa?
+¿Interfaz presenta información relevante (radicados, actuaciones, alertas) de forma clara y accesible?
+¿Flujo de navegación adaptado a lógica de abogado/usuario jurídico (seguimiento por empresa, actuación, fecha)?
+¿Se entiende fácilmente el estado actual del proceso y próximas acciones?
+¿Diseño evita sobrecarga de información y prioriza lo esencial?
+¿Sistema permite identificar rápidamente qué requiere atención urgente?
+¿Existen filtros, buscadores o agrupaciones que mejoren exploración de información?
+¿Interfaz incluye ayudas visuales o textos de apoyo?
+Escala (1-5):
+Interfaz confusa o inaccesible: Presentación desorganizada, lenguaje técnico, flujo no responde a necesidades.
+Usabilidad limitada: Navegación difícil, información mal distribuida o poco priorizada.
+Navegación funcional pero mejorable: Flujo general claro y aceptable, pero con elementos optimizables.
+Interfaz intuitiva y centrada en el usuario: Navegación clara, buen uso visual, lógica orientada a decisiones jurídicas. Preocupación por experiencia de uso.
+Usabilidad sobresaliente y validada: Flujo optimizado, interfaz clara y enfocada al usuario no técnico. Retroalimentación real/simulada, ajustes orientados al uso.
+4. Escalabilidad y Calidad Técnica (20%)
+Evalúa la calidad del código, arquitectura técnica, uso de buenas prácticas y potencial de la solución para crecer, mantenerse y adaptarse.
+Preguntas guía:
+¿Backend y frontend desacoplados, facilitando mantenimiento y evolución?
+¿Estructura de carpetas, rutas y componentes modular y escalable?
+¿Permite futura integración con otras fuentes (ej. SIC)?
+¿Se implementó Docker u otra herramienta para empaquetado y despliegue?
+¿Autenticación implementada usando estándares modernos (OAuth2, Auth0/Firebase)?
+¿Se usaron logs, manejo de errores y pruebas mínimas para depurar/monitorear?
+¿Base de datos normalizada y optimizada para consultas frecuentes y crecimiento futuro?
+¿Está lista para producción (Docker, CI/CD, cloud)?
+¿Uso correcto de archivos .env u otras prácticas para manejo seguro de variables sensibles?
+¿Equipo demuestra conciencia del ciclo de vida del producto más allá de la prueba de concepto?
+Escala (1-5):
+Débil escalabilidad y estructura técnica pobre: Solución monolítica, difícil de mantener/escalar. No usa herramientas modernas.
+Estructura funcional pero limitada: División básica entre componentes, pero con acoplamientos fuertes, sin enfoque en crecimiento/mantenimiento.
+Arquitectura clara con algunas buenas prácticas: Componentes separados, código reutilizable, algunos elementos de empaquetado/despliegue, sin automatización completa.
+Buena arquitectura y preparación para escalar: Uso de contenedores, control de acceso seguro, organización clara, diseño para añadir nuevas fuentes/funcionalidades.
+Solución profesional y lista para producción: Modularidad ejemplar, autenticación segura, empaquetado Docker, CI/CD funcional, escalabilidad demostrada. Extensible a nuevas organizaciones/entornos.
+5. Pitch y Presentación (20%)
+Evalúa la claridad, estructura y capacidad del equipo para comunicar su solución, el valor que aporta y cómo responde al reto. El pitch es clave para transmitir impacto y potencial.
+Preguntas guía:
+¿Equipo explica con claridad el problema que resuelven?
+¿Se entiende rápidamente cómo funciona la solución y qué flujo sigue un usuario?
+¿Pitch demuestra cómo la solución mejora/automatiza seguimiento de procesos judiciales?
+¿Se explicita el rol de la IA generativa?
+¿Se comunica el valor que la solución podría aportar a empresas reales?
+¿Se usan ejemplos o casos de uso concretos para ilustrar impacto?
+¿Presentación clara, lenguaje entendible para no técnicos?
+¿Demo fluido y permite ver claramente funcionalidades clave?
+¿Se justifica elección de tecnologías/enfoques?
+¿Equipo demuestra dominio del tema y de su solución al responder preguntas?
+Escala (1-5):
+Pitch confuso o incompleto: No se entiende problema, solución o uso de IA. Demo no funciona o irrelevante.
+Presentación básica con varios vacíos: Se explican partes principales, pero faltan conexiones claras, ejemplos o justificaciones.
+Pitch adecuado y funcional: Flujo general claro, demo muestra lo esencial, se entiende aporte.
+Presentación convincente y estructurada: Transmite bien valor, lenguaje claro, demo refuerza propuesta.
+Pitch impactante y profesional: Presentación inspiradora, concreta, bien ejecutada. Comunica con claridad problema, solución, uso de GenAI y potencial de adopción.
+GUÍA PARA LA CONSULTA DE PROCESOS JUDICIALES – RAMA JUDICIAL
+Comprender cómo acceder a la información judicial pública de la plataforma de la Rama Judicial es fundamental. Permite búsquedas sin login ni captcha, facilitando integración con soluciones automatizadas. Se recomienda explorar manualmente esta plataforma antes de implementar la solución para entender su comportamiento y parámetros.
+Paso 1: Acceso y opciones de búsqueda
+Al ingresar al sitio web de consulta de procesos judiciales unificados, se encuentran varias opciones de búsqueda. Las más relevantes para este reto son:
+Número de radicación: Cuando se conoce el número exacto del proceso.
+Nombre o razón social: Para buscar todos los procesos en los que una empresa está involucrada.
+Consultar NIT: Alternativa cuando se tiene el número tributario.
+(El sitio muestra opciones como: Consejo Superior de la Judicatura, Corte Suprema de Justicia, Consejo de Estado, Corte Constitucional, Comisión Nacional de Disciplina Judicial).
+Paso 2: Búsqueda por nombre o razón social
+Para obtener procesos asociados a una empresa (ej. Falabella), se recomienda "Consultar por Nombre o Razón Social" o, preferiblemente, "Consultar por NIT" (suele ofrecer resultados más precisos).
+Si el nombre o NIT genera más de 1.000 resultados, la búsqueda no devolverá resultados visualizables; se recomienda aplicar filtros adicionales como Departamento, Ciudad, Entidad o especialidad.
+Observación: El NIT de una empresa es información pública y se puede obtener fácilmente online.
+(La interfaz de búsqueda incluye campos para: Tipo de Persona (Jurídica/Natural), Nombre(s) Apellido o Razón Social, Departamento, Ciudad, Entidad, Especialidad, Despacho, y opciones para "Procesos con Actuaciones Recientes (últimos 30 días)" o "Todos los Procesos").
+Paso 3: Resultados de búsqueda y selección de proceso
+Se presentará un listado con los procesos encontrados. Se puede posicionar el cursor sobre el número de radicado y acceder a los "Detalles del Proceso" para profundizar.
+(La tabla de resultados muestra: Número de Radicación, Fecha de Radicación y última actuación, Despacho y Departamento, Sujetos Procesales).
+Paso 4: Detalle del proceso
+Dentro del detalle de un proceso judicial, los datos se organizan en pestañas:
+Datos del proceso (Fecha de Radicación, Despacho, Ponente, Tipo de Proceso, Clase de Proceso, Subclase de Proceso, Recurso, Ubicación del Expediente, Contenido de Radicación).
+Sujetos procesales.
+Documentos del proceso.
+Actuaciones (de especial interés para este reto).
+Paso 5: Consulta de actuaciones
+La pestaña "Actuaciones" presenta todas las actualizaciones relevantes. Se puede identificar:
+Fecha de actuación.
+Tipo de actuación (ej. “Fijación Estado”, “Auto Inadmite”).
+Anotaciones asociadas.
+Documentos adjuntos (si los hay).
+(La tabla de actuaciones muestra: Fecha de Actuación, Actuación, Anotación, Fecha inicia Término, Fecha finaliza Término, Fecha de Registro, y un ícono para documentos).
+Paso 6: Documentos de una actuación
+No todas las actuaciones tienen un documento asociado. Cuando sí lo tienen, un ícono permite visualizar y descargar los documentos. Esta información es crucial para evaluar la importancia de una actuación o el estado real del proceso.
+(Al hacer clic en el ícono, se muestra una ventana "Documentos de Actuación" con Nombre del archivo, Descripción y opción de Descargar).
+ENDPOINTS UTILIZADOS EN LA NAVEGACIÓN ILUSTRADA
+A continuación, los endpoints correspondientes a la navegación mostrada, que permiten acceder programáticamente a la información judicial de la Rama Judicial:
+Consulta por nombre, departamento y ciudad:
+Permite obtener procesos asociados a una empresa.
+Requiere parámetros: nombre de la razón social, tipo de persona (jur), código de despacho, número de página.
+Ejemplo: https://consultaprocesos.ramajudicial.gov.co:448/api/v2/Procesos/Consulta/NombreRazonSocial?nombre=Falabella&tipoPersona=jur&SoloActivos=true&codificacionDespacho=05001&pagina=1
+Consulta directa por número de radicado:
+Devuelve el proceso asociado a un radicado específico.
+Ejemplo: https://consultaprocesos.ramajudicial.gov.co:448/api/v2/Procesos/Consulta/NumeroRadicacion?numero=05001418900820250032700&SoloActivos=false&pagina=1
+Consulta del detalle de un proceso:
+Requiere idProceso (obtenible de consultas anteriores). Accede a datos generales del proceso.
+Ejemplo: https://consultaprocesos.ramajudicial.gov.co:448/api/v2/Proceso/Detalle/198167821
+Consulta de actuaciones de un proceso:
+Requiere el mismo idProceso. Devuelve listado de actuaciones (fechas, tipos de auto, anotaciones).
+Ejemplo: https://consultaprocesos.ramajudicial.gov.co:448/api/v2/Proceso/Actuaciones/198167821
+Consulta de documentos de una actuación:
+Se obtiene filtrando actuaciones con conDocumentos=True. El campo idRegActuacion se usa como parámetro.
+Ejemplo: https://consultaprocesos.ramajudicial.gov.co:448/api/v2/Proceso/DocumentosActuacion/1715845581
+Descarga del documento de una actuación:
+Una vez obtenido el idRegDocumento del paso anterior, se realiza la descarga directa.
+Ejemplo: https://consultaprocesos.ramajudicial.gov.co:448/api/v2/Descarga/Documento/789551141
+Estos endpoints pueden ser consultados desde un navegador web. Se recomienda esta exploración manual para familiarizarse con la estructura y contenido de la información antes de automatizar flujos. Explorar manualmente los endpoints ayuda a entender la secuencia de llamados, parámetros y cómo se relacionan los identificadores (idProceso, idRegActuacion, idRegDocumento).
