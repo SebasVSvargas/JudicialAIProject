@@ -3,7 +3,10 @@ import datetime
 from app.clients.rama_judicial_client import (
     consultar_procesos_por_nombre,
     consultar_detalle_proceso,
-    consultar_actuaciones_proceso
+    consultar_actuaciones_proceso,
+    consultar_procesos_por_numero_radicacion, # Added
+    consultar_documentos_actuacion, # Added
+    descargar_documento_actuacion # Added
 )
 from app.services.ai_services import (
     generar_resumen_actuacion,
@@ -23,31 +26,65 @@ st.caption(f"Reto 1 Celerix - {datetime.date.today().strftime('%B %d, %Y')}")
 
 # --- Search Section ---
 st.sidebar.header("Buscar Procesos")
-nombre_razon_social = st.sidebar.text_input("Nombre o Razón Social", "")
-# tipo_persona = st.sidebar.selectbox("Tipo Persona", ["jur", "nat"], index=0) # Default to juridica
-cod_despacho = st.sidebar.text_input("Código Despacho (Opcional)", "", help="Ej: 05001 para Medellín")
+
+search_method = st.sidebar.radio(
+    "Método de Búsqueda:",
+    ("Nombre o Razón Social", "Número de Radicación")
+)
+
+nombre_razon_social = ""
+numero_radicacion = ""
+
+if search_method == "Nombre o Razón Social":
+    nombre_razon_social = st.sidebar.text_input("Nombre o Razón Social", "")
+    cod_despacho = st.sidebar.text_input("Código Despacho (Opcional)", "", help="Ej: 05001 para Medellín")
+else: # Número de Radicación
+    numero_radicacion = st.sidebar.text_input("Número de Radicación Completo", "", help="Ej: 05001418900820250032700")
+
 
 if st.sidebar.button("🔍 Buscar Procesos"):
-    if not nombre_razon_social:
-        st.sidebar.error("Por favor, ingrese un nombre o razón social.")
-    else:
-        with st.spinner(f"Buscando procesos para '{nombre_razon_social}'..."):
-            api_procesos_raw = consultar_procesos_por_nombre(
-                nombre=nombre_razon_social,
-                codificacion_despacho=cod_despacho if cod_despacho else None
-            )
-            
-            if api_procesos_raw and api_procesos_raw.get("procesos"):
-                st.session_state.search_results = api_procesos_raw.get("procesos")
-                st.session_state.selected_proceso_id = None # Reset selected process
-                st.sidebar.success(f"{len(st.session_state.search_results)} procesos encontrados.")
-            elif api_procesos_raw:
-                 st.sidebar.warning("No se encontraron procesos o la respuesta no tuvo el formato esperado.")
-                 st.json(api_procesos_raw) # Show raw response for debugging
-                 st.session_state.search_results = []
-            else:
-                st.sidebar.error("Error al consultar la API de la Rama Judicial.")
-                st.session_state.search_results = []
+    st.session_state.search_results = []
+    st.session_state.selected_proceso_id = None # Reset selected process
+    api_procesos_raw = None
+
+    if search_method == "Nombre o Razón Social":
+        if not nombre_razon_social:
+            st.sidebar.error("Por favor, ingrese un nombre o razón social.")
+        else:
+            with st.spinner(f"Buscando procesos para '{nombre_razon_social}'..."):
+                api_procesos_raw = consultar_procesos_por_nombre(
+                    nombre=nombre_razon_social,
+                    codificacion_despacho=cod_despacho if cod_despacho else None
+                )
+    elif search_method == "Número de Radicación":
+        if not numero_radicacion:
+            st.sidebar.error("Por favor, ingrese el número de radicación.")
+        else:
+            with st.spinner(f"Buscando proceso por radicado '{numero_radicacion}'..."):
+                # solo_activos for numero_radicacion is False by default in client
+                api_procesos_raw = consultar_procesos_por_numero_radicacion(
+                    numero_radicacion=numero_radicacion 
+                )
+    
+    if api_procesos_raw:
+        if api_procesos_raw.get("procesos"):
+            st.session_state.search_results = api_procesos_raw.get("procesos")
+            st.sidebar.success(f"{len(st.session_state.search_results)} proceso(s) encontrado(s).")
+        elif search_method == "Número de Radicación" and isinstance(api_procesos_raw, dict) and "idProceso" in api_procesos_raw:
+            # If search by numero_radicacion returns a single process directly (not in a "procesos" list)
+            # This depends on the actual API response structure for this endpoint.
+            # Assuming it might return a list with one item or the item directly.
+            # For now, the client function for numero_radicacion is expected to return a dict with "procesos" key.
+            # If it can return a single process, the client should normalize it or this part needs adjustment.
+            # Based on current client, this branch might not be hit if client always wraps in {"procesos": [...]}
+            st.session_state.search_results = [api_procesos_raw] 
+            st.sidebar.success("1 proceso encontrado.")
+        else:
+            st.sidebar.warning("No se encontraron procesos o la respuesta no tuvo el formato esperado.")
+            st.json(api_procesos_raw) # Show raw response for debugging
+    elif (search_method == "Nombre o Razón Social" and nombre_razon_social) or \
+         (search_method == "Número de Radicación" and numero_radicacion):
+        st.sidebar.error("Error al consultar la API de la Rama Judicial.")
 
 # --- Display Search Results ---
 if 'search_results' in st.session_state and st.session_state.search_results:
@@ -76,6 +113,12 @@ if 'search_results' in st.session_state and st.session_state.search_results:
             except Exception as e:
                 st.error(f"Error al parsear el ID del proceso seleccionado: {e}")
                 st.session_state.selected_proceso_id = None
+            
+            # Store the original search term if it was by name for later use
+            if search_method == "Nombre o Razón Social":
+                st.session_state.nombre_busqueda_cache = nombre_razon_social
+            else:
+                st.session_state.nombre_busqueda_cache = None # Clear if search was by numero
 
 
 # --- Display Process Details and Actuaciones ---
@@ -116,9 +159,9 @@ if 'selected_proceso_id' in st.session_state and st.session_state.selected_proce
                 tipoProceso=detalle_data.get("tipoProceso"),
                 claseProceso=detalle_data.get("claseProceso"),
                 ubicacionExpediente=detalle_data.get("ubicacionExpediente") or detalle_data.get("ubicacion"),
-                demandante=detalle_data.get("demandanteNombre") or "N/A", # Adjust based on actual API field
-                demandado=detalle_data.get("demandadoNombre") or "N/A",   # Adjust based on actual API field
-                nombre_busqueda=nombre_razon_social # Store the search term
+                demandante=detalle_data.get("demandanteNombre") or detalle_data.get("sujetosProcesales", [{}])[0].get("nombre") if isinstance(detalle_data.get("sujetosProcesales"), list) and detalle_data.get("sujetosProcesales") else "N/A",
+                demandado=detalle_data.get("demandadoNombre") or detalle_data.get("sujetosProcesales", [{}, {}])[1].get("nombre") if isinstance(detalle_data.get("sujetosProcesales"), list) and len(detalle_data.get("sujetosProcesales")) > 1 else "N/A",
+                nombre_busqueda=st.session_state.get("nombre_busqueda_cache") # Use cached search name
             )
             proceso_db_id = crud.create_proceso(engine, proceso_data_for_db)
             if not proceso_db_id:
@@ -208,12 +251,70 @@ if 'selected_proceso_id' in st.session_state and st.session_state.selected_proce
                     st.markdown(f"**Resumen IA:**")
                     st.text_area(f"resumen_ia_{act.id}", act.resumen_ia or "No disponible.", height=100, disabled=True, key=f"anot_ia_{act.id}")
                     
-                    col1, col2, col3, col4 = st.columns(4)
-                    col1.text_input("Fecha Registro", act.fechaRegistro or "N/A", disabled=True, key=f"freg_{act.id}")
-                    col2.text_input("Inicia Término", act.fechaIniciaTermino or "N/A", disabled=True, key=f"ftermini_{act.id}")
-                    col3.text_input("Finaliza Término", act.fechaFinalizaTermino or "N/A", disabled=True, key=f"fterminf_{act.id}")
-                    col4.text_input("¿Documentos?", "Sí" if act.conDocumentos else "No", disabled=True, key=f"fdoc_{act.id}")
+                    col1_act, col2_act, col3_act, col4_act = st.columns(4)
+                    col1_act.text_input("Fecha Registro", act.fechaRegistro or "N/A", disabled=True, key=f"freg_{act.id}")
+                    col2_act.text_input("Inicia Término", act.fechaIniciaTermino or "N/A", disabled=True, key=f"ftermini_{act.id}")
+                    col3_act.text_input("Finaliza Término", act.fechaFinalizaTermino or "N/A", disabled=True, key=f"fterminf_{act.id}")
+                    
+                    doc_status = "Sí" if act.conDocumentos else "No"
+                    if act.conDocumentos and act.idRegActuacion:
+                        if col4_act.button(f"Ver Documentos ({doc_status})", key=f"docs_btn_{act.idRegActuacion}"):
+                            st.session_state.actuacion_docs_id_to_show = str(act.idRegActuacion)
+                            st.session_state.documentos_list = None # Reset
+                    else:
+                        col4_act.text_input("¿Documentos?", doc_status, disabled=True, key=f"fdoc_{act.id}")
+                    
                     st.caption(f"ID Actuación (API): {act.idRegActuacion} | ID Actuación (BD): {act.id}")
+
+                    # Display documents for the selected actuacion
+                    if st.session_state.get("actuacion_docs_id_to_show") == str(act.idRegActuacion):
+                        if st.session_state.get("documentos_list") is None: # Fetch only once or if reset
+                            with st.spinner(f"Consultando documentos para actuación {act.idRegActuacion}..."):
+                                docs = consultar_documentos_actuacion(str(act.idRegActuacion))
+                                if docs and isinstance(docs, list):
+                                    st.session_state.documentos_list = docs
+                                elif docs: # API returned something but not a list
+                                    st.warning("Respuesta inesperada al consultar documentos.")
+                                    st.json(docs)
+                                    st.session_state.documentos_list = []
+                                else:
+                                    st.error("No se pudieron obtener los documentos o no hay documentos asociados.")
+                                    st.session_state.documentos_list = []
+                        
+                        if st.session_state.get("documentos_list"):
+                            st.markdown("##### Documentos Asociados:")
+                            for doc_item in st.session_state.documentos_list:
+                                doc_id_reg = doc_item.get("idRegDocumento")
+                                doc_nombre = doc_item.get("nombre", f"Documento ID {doc_id_reg}")
+                                doc_checksum = doc_item.get("checksum")
+                                
+                                doc_col1, doc_col2 = st.columns([3,1])
+                                doc_col1.markdown(f"- **{doc_nombre}** (ID: {doc_id_reg}, Checksum: {doc_checksum or 'N/A'})")
+                                
+                                if doc_id_reg:
+                                    # Generate a unique key for the download button
+                                    download_button_key = f"download_{act.idRegActuacion}_{doc_id_reg}"
+                                    if doc_col2.button(f"📥 Descargar", key=download_button_key):
+                                        with st.spinner(f"Descargando {doc_nombre}..."):
+                                            contenido_doc = descargar_documento_actuacion(str(doc_id_reg))
+                                            if contenido_doc:
+                                                # Determine file extension (this is a guess, API might provide it)
+                                                # For now, defaulting to .pdf if name suggests it, else .bin
+                                                file_extension = ".pdf" if ".pdf" in doc_nombre.lower() else ".zip" if ".zip" in doc_nombre.lower() else ".docx" if ".docx" in doc_nombre.lower() else ".bin"
+                                                
+                                                st.download_button(
+                                                    label=f"Descarga '{doc_nombre}' lista (click de nuevo si no inicia)",
+                                                    data=contenido_doc,
+                                                    file_name=f"{doc_nombre}{file_extension}" if not doc_nombre.endswith(file_extension) else doc_nombre,
+                                                    mime="application/octet-stream" # Generic, or try to infer
+                                                )
+                                                st.success(f"'{doc_nombre}' listo para descargar.")
+                                            else:
+                                                st.error(f"No se pudo descargar el documento {doc_nombre}.")
+                        elif not st.session_state.get("documentos_list") and st.session_state.get("actuacion_docs_id_to_show"):
+                             st.info("No hay documentos asociados a esta actuación o no se pudieron cargar.")
+
+
         else:
             st.info("No hay actuaciones registradas en la base de datos para este proceso.")
 
