@@ -250,13 +250,13 @@ if __name__ == "__main__":
         print(f"No actuaciones found for process {test_id_proceso_static} or error occurred.")
 
     # Test new functions
-    test_numero_radicacion = "05001418900820250032700" # Example from prompt
+    test_numero_radicacion = "05001418900820250032700"
     print(f"\\n--- Test: Consultar Procesos por Número de Radicación ({test_numero_radicacion}) ---")
     proceso_rad = consultar_procesos_por_numero_radicacion(test_numero_radicacion)
     if proceso_rad and proceso_rad.get("procesos"):
         print(f"Found {len(proceso_rad['procesos'])} process(es).")
         for p in proceso_rad["procesos"][:1]:
-             print(f"  ID Proceso: {p.get('idProceso')}, Demandante: {p.get('demandante')}, Demandado: {p.get('demandado')}")
+             print(f"  ID Proceso: {p.get('idProceso')}, Demandante: {p.get('Demandante/accionante')}, Demandado: {p.get('Demandado/indiciado/causante')}")
     elif proceso_rad:
         print("Proceso por radicado response:", proceso_rad)
     else:
@@ -269,7 +269,7 @@ if __name__ == "__main__":
     if documentos_actuacion and isinstance(documentos_actuacion, list) and documentos_actuacion:
         print(f"Found {len(documentos_actuacion)} documento(s) for actuación {test_id_reg_actuacion_docs}.")
         for doc in documentos_actuacion[:1]: # Print first document info
-            print(f"  Nombre: {doc.get('nombre')}, ID Reg Documento: {doc.get('idRegDocumento')}, Checksum: {doc.get('checksum')}")
+            print(f"  Nombre: {doc.get('nombre')}, ID Reg Documento: {doc.get('idRegDocumento')}, Descripcion: {doc.get('descripcion')}")
             if 'idRegDocumento' in doc and not test_id_reg_documento_descarga:
                 test_id_reg_documento_descarga = str(doc.get('idRegDocumento'))
     elif documentos_actuacion:
@@ -282,13 +282,13 @@ if __name__ == "__main__":
         documento_contenido = descargar_documento_actuacion(test_id_reg_documento_descarga)
         if documento_contenido:
             print(f"Documento descargado. Tamaño: {len(documento_contenido)} bytes.")
-            # Example: Save the document
-            # try:
-            #     with open(f"documento_{test_id_reg_documento_descarga}.pdf", "wb") as f: # Assuming PDF
-            #         f.write(documento_contenido)
-            #     print(f"Documento guardado como documento_{test_id_reg_documento_descarga}.pdf")
-            # except IOError as e:
-            #     print(f"Error al guardar el documento: {e}")
+            #Example: Save the document
+            try:
+                with open(f"documento_{test_id_reg_documento_descarga}.pdf", "wb") as f: # Assuming PDF
+                    f.write(documento_contenido)
+                print(f"Documento guardado como documento_{test_id_reg_documento_descarga}.pdf")
+            except IOError as e:
+                print(f"Error al guardar el documento: {e}")
         else:
             print(f"No se pudo descargar el documento {test_id_reg_documento_descarga} or error occurred.")
     else:
